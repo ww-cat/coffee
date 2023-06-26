@@ -59,3 +59,12 @@ export function findMy(params) {
     })
 }
 
+
+export function logout(params) {
+    return request({
+        url: 'logout',
+        method: 'POST',
+        data: params
+    })
+}
+

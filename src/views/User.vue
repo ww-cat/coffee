@@ -39,6 +39,10 @@
                     <span style="color: black">安全中心</span>
                     <span style="float: right"><van-icon name="arrow" /></span>
                 </div>
+                <div class="info" @click="logOut">
+                    <span style="color: black">退出登录</span>
+                    <span style="float: right"><van-icon name="arrow" /></span>
+                </div>
             </div>
         </div>
     </div>
@@ -50,7 +54,7 @@ import {
 } from "vuex";
 import {
     findMy,
-    getUserInfo,
+    getUserInfo, logout,
 } from "@/api/user";
 
 
@@ -63,7 +67,8 @@ export default {
     },
     methods: {
         ...mapMutations({
-           setUserBg: "SET_USER_BACKGROUND_IMG"
+           setUserBg: "SET_USER_BACKGROUND_IMG",
+            setUserToken: 'SET_TOKEN_STRING'
         }),
         toUploadFile() {
           this.$router.push({ path: 'uploadFile' })
@@ -87,6 +92,8 @@ export default {
                         this.userBgI = res.data.result[0].userBg
                         this.setUserBg(this.userBgI)
                     }
+                }).catch(res => {
+                    this.$toast.fail(res.data.msg)
                 })
             }
         },
@@ -96,7 +103,9 @@ export default {
                 tokenString: this.tokenString
             }).then(res => {
                 this.userInfo = res.data.result[0]
-            })
+            }).catch(res => {
+                    this.$toast.fail(res.data.msg)
+                })
         },
         gotoCollect() {
             this.$router.push({ path: "collect" })
@@ -106,6 +115,18 @@ export default {
         },
         toSafetyCenter() {
             this.$router.push({ path: 'userSafety' })
+        },
+        logOut() {
+            let str = "appkey=" + this.$appkey + "&tokenString=" + this.tokenString
+            logout(str).then(res => {
+                if (res.data.code === "F001") {
+                    this.$toast.success(res.data.msg)
+                    this.setUserToken('')
+                    localStorage.clear()
+                }
+            }).catch(res => {
+                this.$toast.fail(res.data.msg)
+            })
         }
     },
     created() {
@@ -114,6 +135,7 @@ export default {
             this.findMy()
             this.userBgI = this.userBg
         }
+
     },
     computed: {
       ...mapState([
@@ -133,7 +155,7 @@ export default {
 <style lang="less" scoped>
     .container {
         background-color: #f5f5f5;
-        padding-bottom: 100px;
+        padding-bottom: 150px;
         .topBgc {
             width: 100%;
             height: 200px;
@@ -148,7 +170,7 @@ export default {
             &:before {
                 content: '';
                 position: absolute;
-                height: 410px;
+                height: 465px;
                 width: 95%;
                 background-color: #fff;
                 top: 150px;

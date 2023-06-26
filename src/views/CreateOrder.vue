@@ -22,7 +22,8 @@
                     </div>
                 </div>
                 <div class="detailAddress">
-                    {{ defaultAddress.province + defaultAddress.city + defaultAddress.county + defaultAddress.addressDetail + defaultAddress.postalCode }}
+                    {{ defaultAddress.province + defaultAddress.city + defaultAddress.county + defaultAddress.addressDetail
+                        + defaultAddress.postalCode }}
                 </div>
             </div>
         </div>
@@ -66,7 +67,7 @@
                 </div>
             </div>
         </div>
-        <van-popup v-model="show" position="bottom" :style="{ height: '40%' }" >
+        <van-popup v-model="show" position="bottom" :style="{ height: '40%' }">
             <div class="allAddress">
                 <div class="top">
                     <div class="text">
@@ -78,7 +79,8 @@
                 </div>
                 <div class="listItem" v-for="(item, index) in userAddressList" :key="index">
                     <div class="checkBox">
-                        <van-checkbox v-model="item.check" @click="changeAddress(item)" checked-color="#0c34ba"></van-checkbox>
+                        <van-checkbox v-model="item.check" @click="changeAddress(item)"
+                            checked-color="#0c34ba"></van-checkbox>
                     </div>
                     <div class="info">
                         <div class="user">
@@ -88,7 +90,7 @@
                             <div class="tel">
                                 {{ item.tel }}
                             </div>
-                            <div class="tag"  v-if="item.isDefault">
+                            <div class="tag" v-if="item.isDefault">
                                 默认
                             </div>
                         </div>
@@ -140,7 +142,7 @@ export default {
             this.defaultAddress = item
         },
         toAddress() {
-           this.$router.push({ path: 'addAddress', query: { tokenString: this.tokenString } })
+            this.$router.push({ path: 'addAddress', query: { tokenString: this.tokenString } })
         },
         goBack() {
             this.$router.go(-1)
@@ -150,18 +152,24 @@ export default {
                 appkey: this.$appkey,
                 tokenString: this.tokenString
             }).then(res => {
-                this.userAddressList = res.data.result
-                this.userAddressList.forEach(item => {
-                    item.check = false
-                    item.isDefault = Boolean(item.isDefault)
-                    item.check = item.isDefault
-                    if (item.isDefault) {
-                        this.defaultAddress = item
+                if (res.data.result.length > 0) {
+                    this.userAddressList = res.data.result
+                    this.userAddressList.forEach(item => {
+                        item.check = false
+                        item.isDefault = Boolean(item.isDefault)
+                        item.check = item.isDefault
+                        if (item.isDefault) {
+                            this.defaultAddress = item
+                        }
+                    })
+                    if (this.defaultAddress == null) {
+                        this.defaultAddress = this.userAddressList[0]
                     }
-                })
-                if (this.defaultAddress == null) {
-                    this.defaultAddress = this.userAddressList[0]
+                } else {
+                    this.defaultAddress = null;
                 }
+            }).catch(res => {
+                this.$toast.fail(res.data.msg)
             })
         },
         payOrder() {
@@ -198,10 +206,11 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .container {
     background-color: #f5f5f5;
     padding-bottom: 70px;
+
     .top {
         display: flex;
         height: 50px;
@@ -222,6 +231,7 @@ export default {
             text-align: center;
         }
     }
+
     .address {
         padding: 10px;
         background-color: #fff;
@@ -229,22 +239,28 @@ export default {
         height: 100px;
         margin: 10px auto;
         border-radius: 10px;
+
         .text {
             color: gray;
         }
+
         .addressItem {
             margin-top: 20px;
+
             .info {
                 display: flex;
+
                 .name {
                     margin-right: 10px;
                     color: #0c34ba;
                     font-weight: bold;
                 }
+
                 .tel {
                     margin-right: 10px;
                     color: gray;
                 }
+
                 .tag {
                     background-color: #0c34b5;
                     font-size: 12px;
@@ -255,44 +271,56 @@ export default {
                 }
             }
         }
+
         .detailAddress {
             margin-top: 20px;
             color: gray;
             font-size: 15px;
         }
     }
+
     .allAddress {
         .top {
             justify-content: space-between;
+
             .text {
                 color: gray;
             }
+
             .cancel {
                 color: gray;
                 font-size: 20px;
             }
         }
+
         padding: 10px;
+
         .listItem {
             display: flex;
             border-bottom: 1px solid #e5e5e5;
             margin-bottom: 20px;
             padding: 10px;
+
             .checkBox {
                 align-self: center;
                 margin-right: 20px;
             }
+
             .info {
                 display: flex;
                 flex-direction: column;
+
                 .user {
                     display: flex;
+
                     .name {
                         margin-right: 20px;
                     }
+
                     .tel {
                         margin-right: 20px;
                     }
+
                     .tag {
                         border-radius: 30px;
                         font-size: 12px;
@@ -303,11 +331,13 @@ export default {
                         color: white;
                     }
                 }
+
                 .detailAddress {
                     font-size: 14px;
                 }
             }
         }
+
         .bottomBtn {
             position: fixed;
             bottom: 10px;
@@ -316,6 +346,7 @@ export default {
             left: 10px;
         }
     }
+
     .orderInfo {
         padding: 10px;
         width: 90%;
@@ -329,21 +360,26 @@ export default {
             color: gray;
             margin-bottom: 20px;
         }
+
         .shopBagList {
             .shopBag {
                 display: flex;
                 margin-bottom: 15px;
+
                 .info {
                     margin-left: 15px;
                     width: 200px;
+
                     .name {
                         display: flex;
+
                         .rule {
                             margin-left: 15px;
                             color: gray;
 
                         }
                     }
+
                     .ename {
                         font-size: 12px;
                         width: 150px;
@@ -354,17 +390,20 @@ export default {
                         margin-bottom: 30px;
                         color: gray;
                     }
+
                     .price {
                         color: #0C34BA;
                         font-weight: bold;
                     }
                 }
+
                 .num {
                     align-self: flex-end;
                 }
             }
         }
     }
+
     .total {
         width: 90%;
         margin: 0 auto;
@@ -372,35 +411,40 @@ export default {
         background-color: #fff;
         padding: 10px;
         border-radius: 10px 10px 0 0;
+
         .now {
             margin-top: 15px;
             font-size: 13px;
             color: gray;
         }
-        .numAndPrice{
+
+        .numAndPrice {
             margin-top: 15px;
             display: flex;
             justify-content: space-between;
+
             .num {
                 color: gray;
             }
+
             .price {
                 color: #0C34BA;
                 font-weight: bold;
             }
         }
     }
+
     .bottom {
         position: fixed;
         width: 100%;
         left: 0;
         bottom: 0;
         height: 50px;
+
         .commit {
             width: 90%;
             border-radius: 30px;
             margin-left: 20px;
         }
     }
-}
-</style>
+}</style>

@@ -124,6 +124,8 @@ export default {
                 if (res.data.msg === '注册成功') {
                     this.$toast.success("注册成功")
                     this.show = false;
+                } else {
+                    this.$toast.fail(res.data.msg)
                 }
             })
         },
@@ -147,6 +149,8 @@ export default {
                     this.findPwd = false
                     if (res.data.code === "L001") {
                         this.$toast.success(res.data.msg)
+                    } else {
+                        this.$toast.fail(res.data.msg)
                     }
                 })
                 return
