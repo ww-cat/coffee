@@ -162,10 +162,6 @@ export default {
         }
     },
     created() {
-        if (this.tokenString === '') {
-            this.$toast.fail("请先登录")
-            this.$router.push({ path: 'login' })
-        }
         this.getUserShopBag();
     }
 }

@@ -96,10 +96,13 @@ const routes = [
 const router = new VueRouter({
   routes
 })
-// router.beforeEach((to, form, next) => {
-//   console.log(to)
-//   console.log(form)
-//   console.log(next)
-// })
-
+// GOOD
+router.beforeEach((to, from, next) => {
+  if (to.name === 'shopbag' && !localStorage.getItem("userToken"))  {
+    router.push({ path: 'login' })
+  }
+  else {
+    next()
+  }
+})
 export default router

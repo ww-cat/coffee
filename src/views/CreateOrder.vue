@@ -197,6 +197,7 @@ export default {
             })
         }
         this.now = new Date().toLocaleString()
+        console.log(this.$route.query.sids)
     },
     computed: {
         ...mapState([

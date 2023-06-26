@@ -87,6 +87,7 @@
           color="#0c34ba"
           type="danger"
           text="立即购买"
+          @click="immediatelyBuy"
         />
       </van-goods-action>
     </div>
@@ -94,7 +95,9 @@
 </template>
 <script>
 import { getProductDetail,addShopBag, findLike, like, deleteCollect, shopCartCount } from "@/api/detail";
-
+import {
+    getUserShopBag,
+} from "@/api/shopBag";
 import {
     mapState
 } from "vuex";
@@ -114,6 +117,41 @@ export default {
     };
   },
   methods: {
+      immediatelyBuy() {
+          if (this.tokenString) {
+              let arr = []
+              if (this.tem !== '') {
+                  arr.push(this.tem)
+              }
+              if (this.sugar !== '') {
+                  arr.push(this.sugar)
+              }
+              if (this.milk !== '') {
+                  arr.push(this.milk)
+              }
+              let rule = arr.join("/")
+              let str = "pid=" + this.productInfo.pid + "&count=" + this.num + "&rule=" + rule + "&appkey=" + this.$appkey + "&tokenString=" + this.tokenString
+              addShopBag(str).then(res => {
+                  if (res.data.code === 3000) {
+                      getUserShopBag({
+                          appkey: this.$appkey,
+                          tokenString: this.tokenString
+                      }).then(res2 => {
+                          res2.data.result.forEach(item => {
+                              if (item.sid === res.data.sid) {
+                                  let arr = []
+                                  arr.push(item)
+                                  this.$router.push({ path: 'createOrder', query: { sids: arr } })
+                              }
+                          })
+                      })
+                  }
+              })
+          } else {
+              this.$toast.fail("请先登录")
+              this.$router.push({ path: 'login' })
+          }
+      },
       toCollect() {
           let str = "appkey=" + this.$appkey + "&pid=" + this.pid + "&tokenString=" + this.tokenString
           if (this.collect) {
@@ -144,31 +182,38 @@ export default {
         this.$router.go(-1);
       },
       findLike() {
-          findLike({
-              appkey: this.$appkey,
-              pid: this.pid,
-              tokenString: this.tokenString
-          }).then(res => {
-              this.collect = res.data.result.length > 0 && res.data.result[0].pid === this.pid;
-          })
+          if (this.tokenString) {
+              findLike({
+                  appkey: this.$appkey,
+                  pid: this.pid,
+                  tokenString: this.tokenString
+              }).then(res => {
+                  this.collect = res.data.result.length > 0 && res.data.result[0].pid === this.pid;
+              })
+          }
       },
       addShopBag() {
-          let arr = []
-          if (this.tem !== '') {
-            arr.push(this.tem)
+          if (this.tokenString) {
+              let arr = []
+              if (this.tem !== '') {
+                  arr.push(this.tem)
+              }
+              if (this.sugar !== '') {
+                  arr.push(this.sugar)
+              }
+              if (this.milk !== '') {
+                  arr.push(this.milk)
+              }
+              let rule = arr.join("/")
+              let str = "pid=" + this.productInfo.pid + "&count=" + this.num + "&rule=" + rule + "&appkey=" + this.$appkey + "&tokenString=" + this.tokenString
+              addShopBag(str).then(res => {
+                  this.$toast.success("加入购物袋成功!")
+                  this.shopCartCount()
+              })
+          } else {
+              this.$toast.fail("请先登录")
+              this.$router.push({ path: 'login' })
           }
-          if (this.sugar !== '') {
-              arr.push(this.sugar)
-          }
-          if (this.milk !== '') {
-              arr.push(this.milk)
-          }
-          let rule = arr.join("/")
-          let str = "pid=" + this.productInfo.pid + "&count=" + this.num + "&rule=" + rule + "&appkey=" + this.$appkey + "&tokenString=" + this.tokenString
-          addShopBag(str).then(res => {
-              this.$toast.success("加入购物袋成功!")
-              this.shopCartCount()
-          })
       },
       getDetail() {
         getProductDetail({ appkey: this.$appkey, pid: this.pid }).then((res) => {
